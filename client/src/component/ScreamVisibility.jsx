@@ -2,6 +2,7 @@ import React from "react";
 import Hewan from "/anjingkucing.png"; // Update with the correct path
 
 const ScreamVisibility = () => {
+  // If visibility reach 100%
   const visibility = localStorage.getItem("highestDbLevel")
 
   return (
