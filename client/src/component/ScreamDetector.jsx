@@ -12,7 +12,7 @@ const ScreamDetector = ({ onScoreUpdate, sensitivity = 1 }) => {
     const audioContext = new (window.AudioContext ||
       window.webkitAudioContext)();
     const analyser = audioContext.createAnalyser();
-    const sensitivityMultiplier = 10; // Adjust sensitivity here
+    const sensitivityMultiplier = 20; // Adjust sensitivity here
 
     navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
       const source = audioContext.createMediaStreamSource(stream);

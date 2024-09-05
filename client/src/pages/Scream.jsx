@@ -12,15 +12,10 @@ function Scream() {
   const [isTimeOver, setIsTimeOver] = useState(false);
   const [score, setScore] = useState(0);
   const [currentScore, setCurrentScore] = useState(0);
+  const [highestDbLevel, setHighestDbLevel] = useState(0);
 
   // Navigation
   const navigate = useNavigate();
-
-  // Load score from localStorage when the component mounts
-  useEffect(() => {
-    const storedScore = parseInt(localStorage.getItem("highestDbLevel")) || 0;
-    setScore(storedScore);
-  }, []);
 
   // Timer for the game
   useEffect(() => {
@@ -39,35 +34,29 @@ function Scream() {
       }, 1000);
     }
     return () => clearInterval(timer);
-  }, [isGameActive]);
+  }, [isGameActive, time]);
 
   // Check for game over conditions
   useEffect(() => {
     if (time === 0 || score >= 100) {
       endGame();
     }
-  }, [time, score]);
+  }, [time]);
 
   // Update visibility and score based on scream
   const handleScream = useCallback(
     (dBLevel) => {
       if (isGameActive && !isTimeOver) {
-        // Calculate scream score within the range of 1 to 100
         const screamScore = Math.max(1, Math.min(100, Math.round(dBLevel)));
         setCurrentScore(screamScore);
 
-        // Retrieve the highest score from localStorage (default to 0 if not present)
-        const highestScore =
-          parseInt(localStorage.getItem("highestDbLevel")) || 0;
-
-        // If the new score is higher, update the state and localStorage
-        if (screamScore > highestScore) {
+        if (screamScore > highestDbLevel) {
+          setHighestDbLevel(screamScore);
           setScore(screamScore);
-          localStorage.setItem("highestDbLevel", screamScore); // Store the highest score
         }
       }
     },
-    [isGameActive, isTimeOver]
+    [isGameActive, isTimeOver, highestDbLevel]
   );
 
   // End game function
@@ -77,6 +66,7 @@ function Scream() {
 
     const userName = localStorage.getItem("userName");
 
+    // Save score to the database
     fetch("http://localhost:4000/api/save", {
       method: "POST",
       headers: {
@@ -87,12 +77,15 @@ function Scream() {
       .then((response) => response.json())
       .then((data) => {
         console.log(data.message);
+        setHighestDbLevel(0); // Reset highestDbLevel after saving score
       })
       .catch((error) => {
         console.error("Error saving score:", error);
+        setHighestDbLevel(0); // Reset highestDbLevel even if there's an error
       });
 
     setTimeout(() => {
+      // Navigate back to the home page after a brief delay
       navigate("/");
     }, 5000);
   }, [score, navigate]);
@@ -104,6 +97,7 @@ function Scream() {
     setIsTimeOver(false);
     setScore(0); // Reset score
     setCurrentScore(0); // Reset current score
+    setHighestDbLevel(0); // Reset highest dB level for this session
   };
 
   // Text gradient
