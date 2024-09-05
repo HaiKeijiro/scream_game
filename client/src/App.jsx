@@ -1,9 +1,9 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import Home from "./Home";
-import Scream from "./Scream";
-import Register from "./Register";
-import TestScream from "./TestScream";
+import Home from "./pages/Home";
+import Scream from "./pages/Scream";
+import Register from "./pages/Register";
+import ExportPage from "./pages/ExportPage";
 
 function App() {
   return (
@@ -11,7 +11,7 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/register" element={<Register />} />
       <Route path="/scream" element={<Scream />} />
-      <Route path="/test-scream" element={<TestScream />} />
+      <Route path="/export" element={<ExportPage />}></Route>
     </Routes>
   );
 }

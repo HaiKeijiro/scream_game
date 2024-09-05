@@ -1,21 +1,37 @@
 import React, { useEffect, useState } from "react";
-import Layout from "./Layout";
+import { useNavigate } from "react-router-dom";
+import Layout from "../component/Layout";
 import Hewan from "/anjingkucing2.png";
-import ScreamVisibility from "./component/ScreamVisibility";
-import ScreamDetector from "./component/ScreamDetector";
+import ScreamVisibility from "../component/ScreamVisibility";
+import ScreamDetector from "../component/ScreamDetector";
 
 function Scream() {
   // States
-  const [time, setTime] = useState(5);
+  const [time, setTime] = useState(60);
   const [isTimeOver, setIsTimeOver] = useState(false);
   const [isScreaming, setIsScreaming] = useState(false);
   const [score, setScore] = useState(0);
+
+  // Navigation
+  const navigate = useNavigate();
 
   // Load score from localStorage when the component mounts
   useEffect(() => {
     const storedScore = parseInt(localStorage.getItem("highestDbLevel")) || 0;
     setScore(storedScore);
   }, []);
+
+  // Timer for the game
+  useEffect(() => {
+    let timer;
+    if (time > 0 && !isTimeOver) {
+      timer = setTimeout(() => setTime((prevTime) => prevTime - 1), 1000);
+    } else if (time === 0 || score >= 100) {
+      setIsTimeOver(true);
+      endGame();
+    }
+    return () => clearTimeout(timer);
+  }, [time, score, isTimeOver]);
 
   // Update visibility and score based on scream
   const handleScream = (dBLevel) => {
@@ -35,33 +51,38 @@ function Scream() {
     }
   };
 
-  // Timer for the game
-  useEffect(() => {
-    let timer;
-
-    if (time > 0 && score < 100) {
-      timer = setTimeout(() => setTime((prevTime) => prevTime - 1), 1000);
-    } else if (time === 0 || score >= 100) {
-      setIsTimeOver(true);
-      endGame();
-    }
-
-    return () => clearTimeout(timer); // Clear timer on unmount or reset
-  }, [time, score]);
-
   // End game function
   const endGame = () => {
     setIsScreaming(false); // Stop scream detection
-    alert("Game over! Your final score: " + score);
+
+    const userName = localStorage.getItem("userName");
+
+    fetch("http://localhost:4000/api/save", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name: userName, score: score }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data.message);
+      })
+      .catch((error) => {
+        console.error("Error saving score:", error);
+      });
+
+    setTimeout(() => {
+      navigate("/");
+    }, 5000);
   };
 
   // Start game function
   const startGame = () => {
     setIsScreaming(true);
-    setTime(5); // Reset time
+    setTime(60); // Reset time
     setIsTimeOver(false);
     setScore(0); // Reset score
-    // localStorage.removeItem("highestDbLevel"); // Clear previous score in localStorage
   };
 
   // Text gradient
@@ -91,7 +112,9 @@ function Scream() {
             <p className={`text-[15em] p-0 leading-none ${styleGradient}`}>
               {score}
             </p>
-            <h6 className={`text-[4em] uppercase font-aptos-bold mt-[2rem] ${styleGradient}`}>
+            <h6
+              className={`text-[4em] uppercase font-aptos-bold mt-[2rem] ${styleGradient}`}
+            >
               {score === 100
                 ? "excellent!"
                 : score === 80
@@ -116,7 +139,11 @@ function Scream() {
         )}
       </div>
       <div className="absolute bottom-10 right-0 left-0">
-        {isScreaming ? <ScreamVisibility /> : <img src={Hewan} alt="Hewan" className="" />}
+        {isScreaming ? (
+          <ScreamVisibility />
+        ) : (
+          <img src={Hewan} alt="Hewan" className="" />
+        )}
       </div>
     </Layout>
   );

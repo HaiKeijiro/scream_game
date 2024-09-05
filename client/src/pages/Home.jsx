@@ -1,8 +1,12 @@
 import { Link, Route, Routes, useNavigate } from "react-router-dom";
-import Layout from "./Layout";
+import Layout from "../component/Layout";
 import Hewan from "/anjingkucing2.png";
 
 function Home() {
+  const refresh = () => {
+    localStorage.clear();
+  };
+
   return (
     <Layout>
       <div className="w-4/5 mx-auto flex flex-col items-center justify-center relative">
@@ -11,6 +15,7 @@ function Home() {
         </h1>
         <Link
           to="/register"
+          onClick={refresh}
           className="bg-[#FFD388] text-[3rem] uppercase font-medium px-[5vw] py-[1vh] rounded-[2rem] mt-[3rem] mx-auto"
         >
           join now

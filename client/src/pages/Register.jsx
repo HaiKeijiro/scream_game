@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Layout from "./Layout";
+import Layout from "../component/Layout";
 import { useNavigate } from "react-router-dom";
 import Hewan from "/anjingkucing2.png";
 
