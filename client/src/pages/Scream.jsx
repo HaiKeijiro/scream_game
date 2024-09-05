@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../component/Layout";
 import Hewan from "/anjingkucing2.png";
@@ -8,9 +8,10 @@ import ScreamDetector from "../component/ScreamDetector";
 function Scream() {
   // States
   const [time, setTime] = useState(60);
+  const [isGameActive, setIsGameActive] = useState(false);
   const [isTimeOver, setIsTimeOver] = useState(false);
-  const [isScreaming, setIsScreaming] = useState(false);
   const [score, setScore] = useState(0);
+  const [currentScore, setCurrentScore] = useState(0);
 
   // Navigation
   const navigate = useNavigate();
@@ -24,36 +25,55 @@ function Scream() {
   // Timer for the game
   useEffect(() => {
     let timer;
-    if (time > 0 && !isTimeOver) {
-      timer = setTimeout(() => setTime((prevTime) => prevTime - 1), 1000);
-    } else if (time === 0 || score >= 100) {
-      setIsTimeOver(true);
+    if (isGameActive && time > 0) {
+      timer = setInterval(() => {
+        setTime((prevTime) => {
+          if (prevTime <= 1) {
+            clearInterval(timer);
+            setIsTimeOver(true);
+            setIsGameActive(false);
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [isGameActive]);
+
+  // Check for game over conditions
+  useEffect(() => {
+    if (time === 0 || score >= 100) {
       endGame();
     }
-    return () => clearTimeout(timer);
-  }, [time, score, isTimeOver]);
+  }, [time, score]);
 
   // Update visibility and score based on scream
-  const handleScream = (dBLevel) => {
-    if (!isTimeOver) {
-      // Calculate scream score within the range of 1 to 100
-      const screamScore = Math.max(1, Math.min(100, Math.round(dBLevel)));
+  const handleScream = useCallback(
+    (dBLevel) => {
+      if (isGameActive && !isTimeOver) {
+        // Calculate scream score within the range of 1 to 100
+        const screamScore = Math.max(1, Math.min(100, Math.round(dBLevel)));
+        setCurrentScore(screamScore);
 
-      // Retrieve the highest score from localStorage (default to 0 if not present)
-      const highestScore =
-        parseInt(localStorage.getItem("highestDbLevel")) || 0;
+        // Retrieve the highest score from localStorage (default to 0 if not present)
+        const highestScore =
+          parseInt(localStorage.getItem("highestDbLevel")) || 0;
 
-      // If the new score is higher, update the state and localStorage
-      if (screamScore > highestScore) {
-        setScore(screamScore);
-        localStorage.setItem("highestDbLevel", screamScore); // Store the highest score
+        // If the new score is higher, update the state and localStorage
+        if (screamScore > highestScore) {
+          setScore(screamScore);
+          localStorage.setItem("highestDbLevel", screamScore); // Store the highest score
+        }
       }
-    }
-  };
+    },
+    [isGameActive, isTimeOver]
+  );
 
   // End game function
-  const endGame = () => {
-    setIsScreaming(false); // Stop scream detection
+  const endGame = useCallback(() => {
+    setIsGameActive(false);
+    setIsTimeOver(true);
 
     const userName = localStorage.getItem("userName");
 
@@ -75,14 +95,15 @@ function Scream() {
     setTimeout(() => {
       navigate("/");
     }, 5000);
-  };
+  }, [score, navigate]);
 
   // Start game function
   const startGame = () => {
-    setIsScreaming(true);
+    setIsGameActive(true);
     setTime(60); // Reset time
     setIsTimeOver(false);
     setScore(0); // Reset score
+    setCurrentScore(0); // Reset current score
   };
 
   // Text gradient
@@ -92,7 +113,7 @@ function Scream() {
   return (
     <Layout>
       <div className="w-4/5 mx-auto flex flex-col items-center justify-center relative text-center">
-        {isScreaming ? (
+        {isGameActive ? (
           <>
             <h1
               className={`text-[5rem] font-aptos-semibold uppercase mt-[1em] leading-none ${styleGradient}`}
@@ -117,7 +138,7 @@ function Scream() {
             >
               {score === 100
                 ? "excellent!"
-                : score === 80
+                : score >= 80
                 ? "great! just little more"
                 : "need more practice"}
             </h6>
@@ -139,8 +160,8 @@ function Scream() {
         )}
       </div>
       <div className="absolute bottom-10 right-0 left-0">
-        {isScreaming ? (
-          <ScreamVisibility />
+        {isGameActive ? (
+          <ScreamVisibility score={currentScore} />
         ) : (
           <img src={Hewan} alt="Hewan" className="" />
         )}

@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Scream from "./pages/Scream";
 import Register from "./pages/Register";
 import ExportPage from "./pages/ExportPage";
+import AdminPage from "./pages/AdminPage";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/scream" element={<Scream />} />
       <Route path="/export" element={<ExportPage />}></Route>
+      <Route path="/admin" element={<AdminPage />}></Route>
     </Routes>
   );
 }
