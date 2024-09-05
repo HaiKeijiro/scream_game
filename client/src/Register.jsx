@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import Layout from "./Layout";
 import { useNavigate } from "react-router-dom";
+import Hewan from "/anjingkucing2.png";
 
 function Register() {
-  const [name, setName] = useState();
-  const navigate = useNavigate();
+  const [name, setName] = useState(""); // State to manage input value
+  const navigate = useNavigate(); // Hook to programmatically navigate
 
   // Save to local storage
   const handleSubmit = () => {
@@ -14,10 +15,16 @@ function Register() {
     }
   };
 
+  // Gradient text
+  const styleGradient =
+    "bg-gradient-to-r from-[#E1BD82] to-[#A1783F] bg-clip-text text-transparent";
+
   return (
     <Layout>
-      <div className="w-4/5 mx-auto flex flex-col items-center justify-center relative">
-        <h1 className="text-[5rem] text-main text-center font-aptos-semibold uppercase mt-[5rem] leading-none">
+      <div className="flex flex-col justify-center items-center px-[5rem]">
+        <h1
+          className={`text-[5em] text-center uppercase mt-[5rem] font-aptos-semibold ${styleGradient}`}
+        >
           scream! <br /> and win the prize
         </h1>
         <div className="flex flex-col items-start w-full">
@@ -29,16 +36,23 @@ function Register() {
             placeholder="Your Name"
             className="text-[3rem] rounded-full px-[4rem] mt-[1rem] w-full"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => setName(e.target.value)} // Update state on input change
             required
           />
         </div>
         <button
-          onClick={handleSubmit}
           className="bg-[#FFD388] text-[3rem] uppercase px-[5vw] py-[1vh] rounded-[2rem] mt-[3rem]"
+          onClick={handleSubmit} // Call handleSubmit on button click
         >
           Register
         </button>
+      </div>
+      <div className="absolute bottom-10 right-0 left-0">
+        <img
+          src={Hewan}
+          alt="hewan.png"
+          className="bg-cover w-[100%] mx-auto -z-10"
+        />
       </div>
     </Layout>
   );

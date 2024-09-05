@@ -16,11 +16,13 @@ function Home() {
           join now
         </Link>
       </div>
-      <img
-        src={Hewan}
-        alt="hewan.png"
-        className="bg-cover mx-auto absolute bottom-0 left-0 right-0"
-      />
+      <div className="absolute bottom-10 right-0 left-0">
+        <img
+          src={Hewan}
+          alt="hewan.png"
+          className="bg-cover w-[100%] mx-auto -z-10"
+        />
+      </div>
     </Layout>
   );
 }

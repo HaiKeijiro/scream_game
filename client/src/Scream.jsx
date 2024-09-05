@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import Layout from "./Layout";
+import Hewan from "/anjingkucing2.png";
 import ScreamVisibility from "./component/ScreamVisibility";
+import ScreamDetector from "./component/ScreamDetector";
 
 function Scream() {
-  const isScreaming = true;
-
-  // States
   const [time, setTime] = useState(60);
-  const [visibility, setVisibility] = useState(0);
+  const [visibility, setVisibility] = useState(1);
 
-  const handleScream = (percentage) => {
-    setVisibility(percentage);
+  const handleScream = (dBLevel) => {
+    setVisibility(Math.max(1, Math.min(100, Math.round(dBLevel))));
+    console.log(Math.max(1, Math.min(100, Math.round(dBLevel))));
   };
 
   // Timer
@@ -28,26 +28,43 @@ function Scream() {
     // alert("game selesai")
   };
 
+  const isScreaming = true;
+
+  // Text gradient
+  const styleGradient =
+    "bg-gradient-to-r from-[#E1BD82] to-[#A1783F] bg-clip-text text-transparent";
+
   return (
     <Layout>
-      <div className="w-4/5 mx-auto flex flex-col items-center justify-center relative text-main text-center">
+      <div className="w-4/5 mx-auto flex flex-col items-center justify-center relative text-center">
         {isScreaming ? (
           <>
-            <h1 className="text-[5rem] font-aptos-semibold uppercase mt-[5rem] leading-none">
+            <h1
+              className={`text-[5rem] font-aptos-semibold uppercase mt-[1em] leading-none ${styleGradient}`}
+            >
               keep screaming <br /> for
             </h1>
-            <p className="text-[12rem]">{time}</p>
-            <ScreamVisibility visibility="100" />
+            <p className={`text-[12em] ${styleGradient}`}>{time}</p>
+            <ScreamDetector onScoreUpdate={handleScream} />
           </>
         ) : (
           <>
-            <h1 className="text-[5rem] font-aptos-semibold uppercase mt-[5rem] leading-none">
+            <h1
+              className={`text-[5em] font-aptos-semibold uppercase mt-[5rem] leading-none ${styleGradient}`}
+            >
               your <br /> scream score
             </h1>
-            <p className="text-[20rem] p-0 leading-none">100</p>
-            <h6 className="text-[5rem] uppercase">excellent!</h6>
+            <p className={`text-[20em] p-0 leading-none ${styleGradient}`}>
+              {visibility}
+            </p>
+            <h6 className={`text-[5em] uppercase ${styleGradient}`}>
+              excellent!
+            </h6>
           </>
         )}
+      </div>
+      <div className="absolute bottom-10 right-0 left-0">
+        {isScreaming ? <ScreamVisibility /> : Hewan}
       </div>
     </Layout>
   );

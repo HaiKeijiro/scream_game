@@ -1,18 +1,20 @@
 import React from "react";
 import Hewan from "/anjingkucing.png"; // Update with the correct path
 
-const ScreamVisibility = ({ visibility }) => {
+const ScreamVisibility = () => {
+  const visibility = localStorage.getItem("highestDbLevel")
+
   return (
     <div
       className="relative w-full overflow-hidden"
       style={{
-        height: "600px", // Set a fixed height for the container
+        height: "900px", // Set a fixed height for the container
       }}
     >
       <div
         className="absolute bottom-0 w-full"
         style={{
-          height: `${visibility}%`,
+          height: `${visibility == 100 ? "100" : visibility}%`,
           overflow: "hidden",
           transition: "height 0.5s ease-in-out",
         }}
